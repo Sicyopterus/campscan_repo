@@ -1,0 +1,350 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampScan - Archer camping area, D'Aguilar National Park</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../camp_pages3.css">
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .facility {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            text-align: center;
+        }
+        .facility img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+        .facility span {
+            flex-grow: 1;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+        hr {
+            border: 0;
+            border-top: 1px solid #ccc;
+            margin: 20px auto;
+            width: 60%;
+        }
+        .facilities-icons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            justify-items: center;
+            align-items: center;
+        }
+        .more-info p {
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.5;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        /* Image Slider Styles */
+        .wrapper {
+            display: flex;
+            max-width: 1200px;
+            position: relative;
+            margin: 20px auto;
+        }
+        .wrapper i {
+            top: 50%;
+            height: 40px;
+            width: 40px;
+            color: #FFFFFF;
+            cursor: pointer;
+            font-size: 1.15rem;
+            position: absolute;
+            text-align: center;
+            line-height: 40px;
+            background: #808080;
+            border-radius: 50%;
+            transform: translateY(-50%);
+            transition: transform 0.1s linear;
+            z-index: 1;
+        }
+        .wrapper i:active {
+            transform: translateY(-50%) scale(0.9);
+        }
+        .wrapper i:hover {
+            background: #666666;
+        }
+        .wrapper i:first-child {
+            left: -20px;
+        }
+        .wrapper i:last-child {
+            right: -20px;
+        }
+        .wrapper i::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            border-top: 2px solid #FFFFFF;
+            border-right: 2px solid #FFFFFF;
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+        .wrapper i:first-child::before {
+            transform: translate(-50%, -50%) rotate(-135deg);
+        }
+        .wrapper .carousel {
+            font-size: 0px;
+            cursor: pointer;
+            overflow: hidden;
+            white-space: nowrap;
+            scroll-behavior: smooth;
+        }
+        .carousel.dragging {
+            cursor: grab;
+            scroll-behavior: auto;
+        }
+        .carousel.dragging .campground {
+            pointer-events: none;
+        }
+        .carousel .campground {
+            display: inline-block;
+            width: 340px;
+            height: 340px;
+            margin-right: 14px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            text-decoration: none;
+        }
+        .carousel .campground:last-child {
+            margin-right: 0;
+        }
+        .image-credit {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            color: white;
+            font-size: 8px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            padding: 5px;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0));
+            text-align: right;
+        }
+
+    .hero {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 1.0rem 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .header-content {
+        width: 1000px;
+        text-align: center;
+        padding-right: 20px;
+    }
+    .header-content h1 {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    .header-content .text-styling {
+        width: 100%;
+    }
+        .scan-button {
+            background-color: #ff7f2a;
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 15px;
+            white-space: nowrap;
+            align-self: center;
+            margin-left: 20px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+
+        .facilities {
+            padding-top: 10px;
+        }
+        #map {
+            width: 100%;
+            height: 400px;
+            margin-top: 20px;
+        }
+        @media screen and (max-width: 900px) {
+            .carousel .campground {
+                width: calc(50% - 7px);
+                height: calc(50vw - 7px);
+            }
+        }
+        @media screen and (max-width: 550px) {
+            .carousel .campground {
+                width: 100%;
+                height: 100vw;
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                 <a href="../index2.html"><img src="images/CampScan-Logo6.png" alt="CampScan Logo"></a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="../index2.html">Home</a></li>
+                <li><a href="#">Features</a></li>
+                <li><a href="#">Pricing</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+    <section class="hero">
+        <div class="header-content">
+            <h1>Archer camping area, D'Aguilar National Park</h1>
+            <hr>
+            <p class="text-styling">Pitch your tent and sleep under a blaze of stars at this forested camping area set beside Neurum Creek.</p>
+        </div>
+        <a href="../scan_pages/Archer_camping_area_D_Aguilar_National_Park_scan.html" class="scan-button">SCAN</a>
+    </section>
+        <section class="image-slider">
+            <div class="wrapper">
+                <i id="left" class="fa-solid fa-angle-left"></i>
+                <div class="carousel">
+                    
+        <a class="campground" style="background-image: url('images/Archer_camping_area_DAguilar_National_Park_placeholder_0.jpg')" href="#">
+            <div class="image-credit"></div>
+        </a>
+        
+        <a class="campground" style="background-image: url('images/Archer_camping_area_DAguilar_National_Park_placeholder_1.jpg')" href="#">
+            <div class="image-credit"></div>
+        </a>
+        
+        <a class="campground" style="background-image: url('images/Archer_camping_area_DAguilar_National_Park_placeholder_2.jpg')" href="#">
+            <div class="image-credit"></div>
+        </a>
+        
+                </div>
+                <i id="right" class="fa-solid fa-angle-right"></i>
+            </div>
+        </section>
+            <section class="facilities">
+        <h2>Facilities</h2>
+        <div class="facilities-icons">
+            <div class="facility"><img src="images/f4a3a454763e611030efa64912cf2a4e.png" alt="Campfires allowed (conditions apply)"><span>Campfires allowed (conditions apply)</span></div>
+<div class="facility"><img src="images/60a795ad749c413806af95f3d9b8a9af.png" alt="Toilets (flush)"><span>Toilets (flush)</span></div>
+<div class="facility"><img src="images/1a289bbe9a530af408e78ff1302c1bd4.png" alt="Tent camping"><span>Tent camping</span></div>
+<div class="facility"><img src="images/0d3d309b4910e116753337777949228c.png" alt="Shower cubicle (BYO shower)"><span>Shower cubicle (BYO shower)</span></div>
+<div class="facility"><img src="images/b77d38dca8386ae7dd7a2a868e6c1254.png" alt="Short walk to tent"><span>Short walk to tent</span></div>
+<div class="facility"><img src="images/8c957923b784eb0a017226b53e68af9b.png" alt="Scenic drive"><span>Scenic drive</span></div>
+<div class="facility"><img src="images/673a68ce8187ca7ebe000855e41f31b9.png" alt="Trail bike riding"><span>Trail bike riding</span></div>
+<div class="facility"><img src="images/96749f3acc402f5e3f24bd51c43afd5d.png" alt="Swimming"><span>Swimming</span></div>
+
+        </div>
+    </section>
+           <section class="more-info">
+            <p class="text-styling">To find out more about this site, visit the <a href="https://parks.desi.qld.gov.au/parks/daguilar/camping/archer" target="_blank">Queensland Parks and Wildlife Service website</a>.</p>
+         <section class="map">
+        <div id="map"></div>
+    </section>
+        </section>
+    </main>
+    <footer class="footer">
+        <p>&copy; 2024 CampScan. All rights reserved.</p>
+    </footer>
+    <script>
+        const carousel = document.querySelector(".carousel"),
+        firstImg = carousel.querySelectorAll(".campground")[0],
+        arrowIcons = document.querySelectorAll(".wrapper i");
+
+        let isDragStart = false, isDragging = false, prevPageX, prevScrollLeft, positionDiff;
+
+        const showHideIcons = () => {
+            let scrollWidth = carousel.scrollWidth - carousel.clientWidth;
+            arrowIcons[0].style.display = carousel.scrollLeft == 0 ? "none" : "block";
+            arrowIcons[1].style.display = carousel.scrollLeft == scrollWidth ? "none" : "block";
+        }
+
+        arrowIcons.forEach(icon => {
+            icon.addEventListener("click", () => {
+                let firstImgWidth = firstImg.clientWidth + 14;
+                carousel.scrollLeft += icon.id == "left" ? -firstImgWidth : firstImgWidth;
+                setTimeout(() => showHideIcons(), 60);
+            });
+        });
+
+        const autoSlide = () => {
+            if(carousel.scrollLeft - (carousel.scrollWidth - carousel.clientWidth) > -1 || carousel.scrollLeft <= 0) return;
+            positionDiff = Math.abs(positionDiff);
+            let firstImgWidth = firstImg.clientWidth + 14;
+            let valDifference = firstImgWidth - positionDiff;
+            if(carousel.scrollLeft > prevScrollLeft) {
+                return carousel.scrollLeft += positionDiff > firstImgWidth / 3 ? valDifference : -positionDiff;
+            }
+            carousel.scrollLeft -= positionDiff > firstImgWidth / 3 ? valDifference : -positionDiff;
+        }
+
+        const dragStart = (e) => {
+            isDragStart = true;
+            prevPageX = e.pageX || e.touches[0].pageX;
+            prevScrollLeft = carousel.scrollLeft;
+        }
+
+        const dragging = (e) => {
+            if(!isDragStart) return;
+            e.preventDefault();
+            isDragging = true;
+            carousel.classList.add("dragging");
+            positionDiff = (e.pageX || e.touches[0].pageX) - prevPageX;
+            carousel.scrollLeft = prevScrollLeft - positionDiff;
+            showHideIcons();
+        }
+
+        const dragStop = () => {
+            isDragStart = false;
+            carousel.classList.remove("dragging");
+            if(!isDragging) return;
+            isDragging = false;
+            autoSlide();
+        }
+
+        carousel.addEventListener("mousedown", dragStart);
+        carousel.addEventListener("touchstart", dragStart);
+        document.addEventListener("mousemove", dragging);
+        carousel.addEventListener("touchmove", dragging);
+        document.addEventListener("mouseup", dragStop);
+        carousel.addEventListener("touchend", dragStop);
+
+        // Mapbox
+        mapboxgl.accessToken = 'pk.eyJ1IjoiY2FydGVydmF5IiwiYSI6ImNrZHJ4Y25ndTBoazkzMGxxYTE1YWI0c3YifQ.hRfqDBAkySh2Zjc4pEqw_A';
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/outdoors-v11',
+            center: [152.6976, -27.0155],
+            zoom: 13
+        });
+
+        map.addControl(new mapboxgl.NavigationControl());
+
+        new mapboxgl.Marker()
+            .setLngLat([152.6976, -27.0155])
+            .addTo(map);
+    </script>
+</body>
+</html>
