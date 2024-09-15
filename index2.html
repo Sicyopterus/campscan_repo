@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampScan - Find Available Campgrounds</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                <a href="index2.html"><img src="images/CampScan-Logo6.png" alt="CampScan Logo"></a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index2.html">Home</a></li>
+                <li><a href="#">Features</a></li>
+                <li><a href="#">Pricing</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Camp at sold out campgrounds.</h1>
+            <p class="text-styling">Be notified when someone cancels their reservation, for free.</p>
+            <div class="search-bar">
+                <input type="text" placeholder="Search for a campground...">
+                <button class="search-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8" fill="#ff7f2a" stroke="#002255"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="#002255"></line>
+                    </svg>
+                </button>
+                <div id="search-results" class="search-results"></div>
+            </div>
+        </section>
+        <div class="how-it-works">
+            <div class="step">
+              <span class="step-number">1</span>
+              <h3>Search</h3>
+              <p>Search for your favourite national park campgrounds in Queensland.</p>
+            </div>
+            <div class="step">
+              <span class="step-number">2</span>
+              <h3>Scan</h3>
+              <p>Set up a scan by selecting your preferred arrival dates and sites.</p>
+            </div>
+            <div class="step">
+              <span class="step-number">3</span>
+              <h3>Book</h3>
+              <p>We'll monitor cancellations and notify you when something comes up.</p>
+            </div>
+          </div>
+
+          <section class="trending">
+            <h2>Trending Campgrounds</h2>
+            <div class="campgrounds-grid">
+                <a href="campsite_pages/Lawn_Hill_Gorge_(trailer)_camping_area_Lawn_Hill_Gorge_Boodjamulla_National_Park_(Aboriginal_Land).html" class="campground" style="background-image: linear-gradient( rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.5) ), url('images/boodjamulla.jpg')">
+                    <div class="campground-name">Lawn Hill Gorge</div>
+                    <div class="campground-location">Boodjamulla National Park</div>
+                </a>
+                <a href="campsite_pages/Upper_Davies_Creek_camping_area_Davies_Creek_National_Park_Dinden_National_Park_Dinden_West_Forest_Reserve_and_Bare_Hill_Conservation_Park.html" class="campground" style="background-image: linear-gradient( rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.5) ), url('images/davies.jpeg')">
+                    <div class="campground-name">Davies Creek</div>
+                    <div class="campground-location">Dinden National Park</div>
+                </a>
+                <a href="campsite_pages/Eliot_Falls_camping_area_Jardine_River_National_Park_Heathlands_Resources_Reserve_and_Jardine_River_Resources_Reserve.html" class="campground" style="background-image: linear-gradient( rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.5) ), url('images/eliot.jpg')">
+                    <div class="campground-name">Eliot Falls</div>
+                    <div class="campground-location">Jardine River National Park</div>
+                </a>
+                <a href="campsite_pages/Waddy_Point_Top_(tent_site)_camping_area_Kgari_Great_Sandy_National_Park.html" class="campground" style="background-image: linear-gradient( rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.5) ), url('images/waddy_point.jpeg')">
+                    <div class="campground-name">Waddy Point</div>
+                    <div class="campground-location">K'gari, Great Sandy National Park</div>
+                </a>
+                <a href="campsite_pages/Crayfish_Beach_Hook_Island_Whitsunday_Islands_National_Park.html" class="campground" style="background-image: linear-gradient( rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.5) ), url('images/whitsunday.jpg')">
+                    <div class="campground-name">Crayfish Beach</div>
+                    <div class="campground-location">Whitsunday Islands National Park</div>
+                </a>
+                <a href="campsite_pages/Seven_Mile_camping_area_Rinyirru_(Lakefield)_National_Park_(CYPAL).html" class="campground" style="background-image: linear-gradient( rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.5) ), url('images/lakefield.jpg')">
+                    <div class="campground-name">Seven Mile Lagoon</div>
+                    <div class="campground-location">Rinyirru (Lakefield) National Park</div>
+                </a>
+            </div>
+        </section>
+
+    <footer>
+        <p>&copy; 2024 CampScan. All rights reserved.</p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.querySelector('.search-bar input');
+            const searchButton = document.getElementById('campground_search_btn');
+            const searchResults = document.getElementById('search-results');
+            let campsites = [
+    "Agnes Beach camping area, Hinchinbrook Island National Park",
+  "Alligator Falls camping area, Mount Elliot, Bowling Green Bay National Park",
+  "Amamoor Creek camping area, Amamoor State Forest",
+  "Annie River camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "Aquila Island, Broad Sound Islands National Park",
+  "Archer camping area, D'Aguilar National Park",
+  "Armit Island, Gloucester Islands National Park",
+  "Auburn River camping area, Auburn River National Park",
+  "Awinya Creek camping area, K'gari, Great Sandy National Park",
+  "Baldy Mountain Forest Reserve bush camping, Herberton Range National Park, Herberton Range Conservation Park, Herberton Range State Forest and Baldy Mountain Forest Reserve",
+  "Ballow Creek Junction remote bush camp, Mount Barney National Park",
+  "Banksia Bay camping area, Hinchinbrook Island National Park",
+  "Banshee Bay camping area, Hinchinbrook Island National Park",
+  "Barney Gorge Junction remote bush camp, Mount Barney National Park",
+  "Barrabool remote bush camp, Mount Barney National Park",
+  "Barratta Creek camping area, Bowling Green Bay, Bowling Green Bay National Park",
+  "Bartle Frere trail camping, Bartle Frere trail, Wooroonooran National Park",
+  "Basin Hole camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "Beach camping area, Charon Point Conservation Park",
+  "Beach camping zone 1 - Govi and Wongai, K'gari, Great Sandy National Park",
+  "Beach camping zone 2 - One Tree, Cornwells, Gabala, K'gari, Great Sandy National Park",
+  "Beach camping zone 3 - Poyungan and Winnam, K'gari, Great Sandy National Park",
+  "Beach camping zone 4 - Guluri and Eli, K'gari, Great Sandy National Park",
+  "Beach camping zone 5 - Maheno and Wahba, K'gari, Great Sandy National Park",
+  "Beach camping zone 6 - Eugarie, Yurru, Guruman, K'gari, Great Sandy National Park",
+  "Beach camping zone 7 - Wyuna and Burad, K'gari, Great Sandy National Park",
+  "Beach camping zone 8 - Marloo, Ocean Lake, Duling, K'gari, Great Sandy National Park",
+  "Beach camping zone 9 - Diray and Carree, K'gari, Great Sandy National Park",
+  "Beilba camping area, Expedition National Park",
+  "Ben-Ewa camping area, Gheebulum Kunungai (Moreton Island) National Park and Moreton Island Recreation Area",
+  "Big Bend camping area, Carnarvon Gorge, Carnarvon National Park",
+  "Big Bend walkers' camp (Great Walk), Carnarvon Great Walk",
+  "Big Crystal Creek camping area, Mount Spec section, Paluma Range National Park",
+  "Bizant River camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "Blaksley camping area, Naree Budjong Djara National Park",
+  "Blanket Creek walkers' camp, Juwun and Jambal walks, Wet Tropics Great Walk",
+  "Blencoe Falls camping area, Blencoe Falls, Girringun National Park",
+  "Bloodwood camping area, Conway Range trail, Conway National Park and Conway Conservation Park",
+  "Blue Lagoon camping area, Gheebulum Kunungai (Moreton Island) National Park and Moreton Island Recreation Area",
+  "Boat Port, Lindeman Island, Lindeman Islands National Park",
+  "Boat ramp camping area, Charon Point Conservation Park",
+  "Bona Bay, Gloucester Island, Gloucester Islands National Park",
+  "Booloumba Creek 1 camping area, Conondale National Park",
+  "Booloumba Creek 3 camping area, Conondale National Park",
+  "Booloumba Creek 4 camping area, Conondale National Park",
+  "Boonah Border Gate remote bush camp, Mount Barney National Park",
+  "Boorangoora (Lake McKenzie) great walk camp sites, K'gari (formerly Fraser Island) Great Walk",
+  "Bottom Whiphandle Waterhole camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "Bough Shed Waterhole camping area, Bladensburg National Park",
+  "Bowal Creek camping area, K'gari, Great Sandy National Park",
+  "Bowarrady Creek camping area, K'gari, Great Sandy National Park",
+  "Brahminy walkers' camp, Cooloola Great Walk",
+  "Broadwater camping area, Broadwater, Abergowrie State Forest",
+  "Broadwater Waterhole camping area, Lochern National Park",
+  "Broken River camping area, Eungella National Park",
+  "Brown Creek camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "Bunbuncundoo Springs (Ka Ka Mundi) camping area, Ka Ka Mundi, Carnarvon National Park",
+  "Burbank bush camp, Mount Barney National Park",
+  "Burdekin River camping area, Dalrymple National Park",
+  "Burrajum Peak remote bush camp, Mount Barney National Park",
+  "Burrows Waterhole camping area, Sundown National Park",
+  "Burrum Point camping area, Burrum Coast National Park",
+  "Burtons Well camping area, Bunya Mountains National Park",
+  "Bustard Head camping area, Eurimbula National Park",
+  "Byra Lagoon camping area, Culgoa Floodplain National Park",
+  "Cabbage Tree camping zone (Great Walk), Carnarvon Great Walk",
+  "Cairn Beach, Whitsunday Island, Whitsunday Islands National Park",
+  "Caiwarro Waterhole camping area, Currawinya National Park",
+  "Camping area 1, Halifax Bay Wetlands National Park",
+  "Camping area 2, Halifax Bay Wetlands National Park",
+  "Cannabullen Creek camping area, Misty Mountains wilderness tracks",
+  "Canns Camp Creek camping area, White Mountains National Park",
+  "Cape Creek camping area, Cape Palmerston National Park",
+  "Cape Palmerston camping area, Cape Palmerston National Park",
+  "Captain Billy Landing camping area, Jardine River National Park, Heathlands Resources Reserve and Jardine River Resources Reserve",
+  "Carnarvon Gorge camping area, Carnarvon Gorge, Carnarvon National Park",
+  "Carter Creek (Cannabullen Track) camping area, Misty Mountains wilderness tracks",
+  "Castle Rock (PWD sites) camping area, Girraween National Park",
+  "Castle Rock (tent site) camping area, Girraween National Park",
+  "Castle Rock (trailer sites) camping area, Girraween National Park",
+  "Castle Rock (trailer/tent sites) camping area, Girraween National Park",
+  "Castle Tower bush camping area, Castle Tower National Park",
+  "Cedar Bay camping area, Mangkalba (Cedar Bay), Ngalba Bulal National Park",
+  "Cedar Grove camping area, Amamoor State Forest",
+  "Cedar Pass remote bush camp, Mount Barney National Park",
+  "Central Station (tent site) camping area, K'gari, Great Sandy National Park",
+  "Central Station (trailer site) camping area, K'gari, Great Sandy National Park",
+  "Central Station great walk camp sites, K'gari (formerly Fraser Island) Great Walk",
+  "Chance Bay, Whitsunday Island, Whitsunday Islands National Park",
+  "Charlie Moreland camping area, Imbil State Forest",
+  "Chilli Beach camping area, Kutini-Payamu (Iron Range) National Park (CYPAL)",
+  "Chipps Hut camping area, Shoalwater Bay Conservation Park",
+  "Chong Swamp camping area, Oyala Thumotang National Park (CYPAL)",
+  "Clancys camping area, Benarkin State Forest",
+  "Cleared Ridge remote bush camp, Mount Barney National Park",
+  "Cochable Creek camping area, Tully section, Tully Gorge National Park",
+  "Cockatoo Beach, North Molle Island, Molle Islands National Park",
+  "Cockatoo Creek camping area, Mount Elliot, Bowling Green Bay National Park",
+  "Cockermouth Island, South Cumberland Islands National Park",
+  "Cocoa Creek camping area, Cape Cleveland, Bowling Green Bay National Park",
+  "Coconut Beach camping area, Cape Upstart National Park",
+  "Comboyuro Point camping area, Gheebulum Kunungai (Moreton Island) National Park and Moreton Island Recreation Area",
+  "Conical Island camping area, Keppel Bay Islands National Park and Keppel Bay Islands National Park (Scientific)",
+  "Consuelo camping zone (Great Walk), Carnarvon Great Walk",
+  "Coochin Creek, Beerburrum and Beerwah State Forests",
+  "Cooks Hut camping area, Kutini-Payamu (Iron Range) National Park (CYPAL)",
+  "Coolooloi Creek camping area, K'gari, Great Sandy National Park",
+  "Coombe Island camping area, Family Islands National Park",
+  "Coongul Creek camping area, K'gari, Great Sandy National Park",
+  "Cordalba State Forest bush camping, Cordalba State Forest",
+  "Corni Paroo camping area, Currawinya National Park",
+  "Cornwells camping area (fenced), K'gari, Great Sandy National Park",
+  "Crayfish Beach, Hook Island, Whitsunday Islands National Park",
+  "Crediton Hall walkers' camp, Mackay Highlands Great Walk",
+  "Crocodile camping area, Cape Melville National Park (CYPAL)",
+  "Crows Nest Falls camping area, Crows Nest National Park",
+  "Curlew Beach, Hook Island, Whitsunday Islands National Park",
+  "Curri Curri bush camping, Danbulla National Park and State Forest",
+  "Dandabah camping area, Bunya Mountains National Park",
+  "Dargonelly Rock Hole (Mount Moffatt) camping area, Mount Moffatt, Carnarvon National Park",
+  "Darlington remote bush camp, Lamington National Park",
+  "Davies Ridge remote bush camp, Main Range National Park",
+  "Denham Range camping area, Crediton State Forest",
+  "Denham Range walkers' camp, Mackay Highlands Great Walk",
+  "Denman Island, Molle Islands National Park",
+  "Dingo swamp remote bush camp, Girraween National Park",
+  "Dingo Waterhole camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "Divided Island camping area, Keppel Bay Islands National Park and Keppel Bay Islands National Park (Scientific)",
+  "Dogwood Creek camping area, Barakula State Forest",
+  "Dorrigo South camping area, Inskip Peninsula Recreation Area",
+  "Double Top remote bush camp, Main Range National Park",
+  "Downey Creek camping area, Misty Mountains wilderness tracks",
+  "Downfall Creek camping area, Danbulla National Park and State Forest",
+  "Dugong Beach, Whitsunday Island, Whitsunday Islands National Park",
+  "Dundas Road remote bush camp, D'Aguilar National Park",
+  "Dundubara (tent site) camping area, K'gari, Great Sandy National Park",
+  "Dundubara (trailer site) camping area, K'gari, Great Sandy National Park",
+  "Dunk Island camping area, Family Islands National Park",
+  "Dutgee walkers' camp, Cooloola Great Walk",
+  "East Hope Island camping area, Hope Islands National Park (CYPAL)",
+  "East Side Bay, Gloucester Island, Gloucester Islands National Park",
+  "Echo Point bush camp, Lamington National Park",
+  "Eli camping area (fenced), K'gari, Great Sandy National Park",
+  "Eliot Falls camping area, Jardine River National Park, Heathlands Resources Reserve and Jardine River Resources Reserve",
+  "Emu Creek camping area, Benarkin State Forest",
+  "Emu Swamp camping area, Blackbraes National Park",
+  "England Creek remote bush camp, D'Aguilar National Park",
+  "Eurimbula Creek camping area, Eurimbula National Park",
+  "Expedition remote bush camp, Expedition National Park",
+  "Fern Flat camping area, Eungella National Park",
+  "Fern Flat walkers' camp, Mackay Highlands Great Walk",
+  "Figtree Point camping area, Cooloola Recreation Area, Great Sandy National Park",
+  "First Coen River camping area, Oyala Thumotang National Park (CYPAL)",
+  "Five Mile Creek camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "Five Rocks camping area, Byfield National Park, Conservation Park and State Forest",
+  "Flaxton walkers' camp, Sunshine Coast Hinterland Great Walk",
+  "Flinders Island camping area, Flinders Group National Park (CYPAL)",
+  "Flock Pigeon Island, Broad Sound Islands National Park",
+  "Fong-On Bay camping area, Danbulla National Park and State Forest",
+  "Forestry bush camp, Mount Barney National Park",
+  "Four Mile Waterhole camping area, Forest Den National Park",
+  "Freshwater (tent site) camping area, Cooloola Recreation Area, Great Sandy National Park",
+  "Freshwater (trailer site) camping area, Cooloola Recreation Area, Great Sandy National Park",
+  "Frog Buttress camping area, Moogerah Peaks National Park",
+  "Gadd's walkers' camp (Great Walk), Carnarvon Great Walk",
+  "Gallagher Point camping area, Bribie Island National Park and Recreation Area",
+  "Garrys Anchorage camping area, K'gari, Great Sandy National Park",
+  "George Point camping area, Hinchinbrook Island National Park",
+  "Gheerulla camping area, Mapleton National Park",
+  "Glastonbury Creek camping area, Brooyar State Forest",
+  "Glen Rock camping area, Main Range Conservation Park",
+  "Goldsborough Valley Bora Ground camping area, Goldsborough Valley, Wooroonooran National Park",
+  "Goldsborough Valley camping area, Goldsborough Valley, Wooroonooran National Park",
+  "Gordon Creek camping area, Kutini-Payamu (Iron Range) National Park (CYPAL)",
+  "Governor's Waterhole camping area, Oyala Thumotang National Park (CYPAL)",
+  "Graham Range camping area, Russell River National Park",
+  "Granite camping area, Cape Melville National Park (CYPAL)",
+  "Granite Creek camping area, Mangkalba (Cedar Bay), Ngalba Bulal National Park",
+  "Griffiths Creek camping area, Kroombit Tops National Park",
+  "Grimston Point camping area, Dryander National Park",
+  "Gum Hole camping area, Diamantina National Park",
+  "Hann Crossing camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "Hanushs Waterhole camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "Harrys (river access) camping area, Cooloola Recreation Area, Great Sandy National Park",
+  "Harrys (vehicle access) camping area, Cooloola Recreation Area, Great Sandy National Park",
+  "Haydens Flat remote bush camp, Girraween National Park",
+  "Haydens Ridge remote bush camp, Girraween National Park",
+  "Hedleys camping area, Tuan State Forest",
+  "Henrietta Creek camping area, Palmerston (Doongan), Palmerston (Doongan), Wooroonooran National Park",
+  "Herbert River camping zone, Juwun and Jambal walks, Wet Tropics Great Walk",
+  "Hexham Island, Broad Sound Islands National Park",
+  "High Island camping area, Frankland Group National Park",
+  "High Peak Island, Broad Sound Islands National Park",
+  "Hinson Creek camping area, Misty Mountains wilderness tracks",
+  "Hoop Pines remote bush camp, Mount Barney National Park",
+  "Horseshoe Bay camping area, Teerk Roo Ra National Park",
+  "Horseshoe Lagoon camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "Horsetailer Waterhole camping area, Oyala Thumotang National Park (CYPAL)",
+  "Hummocky Island camping area, Keppel Bay Islands National Park and Keppel Bay Islands National Park (Scientific)",
+  "Humpy Island camping area, Keppel Bay Islands National Park and Keppel Bay Islands National Park (Scientific)",
+  "Hunters Gorge camping area, Diamantina National Park",
+  "Huntley-Sentinel Saddle remote bush camp, Main Range National Park",
+  "Illinbah bush camp, Lamington National Park",
+  "Isla Gorge camping area, Isla Gorge National Park",
+  "Jabiru Swamp great walk camp sites, K'gari (formerly Fraser Island) Great Walk",
+  "Jaxut camping area, Cathu State Forest",
+  "Jeffries Beach, Woody Island (Tooliewah) and Little Woody Island (Walangoora), Great Sandy National Park",
+  "Jerry Lagoon camping area, Oyala Thumotang National Park (CYPAL)",
+  "Joe's Beach, Whitsunday Island, Whitsunday Islands National Park",
+  "Joey Lees camping area, Curtis Island National Park and Conservation Park",
+  "Jourama Falls camping area, Paluma Range National Park",
+  "Kalpowar camping area (Gladstone), Kalpowar State Forest",
+  "Kalpowar Crossing camping area (North Qld), Rinyirru (Lakefield) National Park (CYPAL)",
+  "Kambuwal (tent sites) camping area, Girraween National Park",
+  "Kambuwal (trailer sites) camping area, Girraween National Park",
+  "Kauri Creek camping area, Danbulla National Park and State Forest",
+  "Kauri walkers' camp, Cooloola Great Walk",
+  "Kennedy Bend camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "Kent Island camping area (Commonwealth Island), Barnard Island Group National Park",
+  "Kings Dam camping area, Goodedulla National Park",
+  "Kinkuna Section bush camping, Burrum Coast National Park",
+  "Knoll E12 remote bush camp, Main Range National Park",
+  "Knoll T30 remote bush camp, Main Range National Park",
+  "Koolmoon Creek headwaters camping area, Misty Mountains wilderness tracks",
+  "Koombooloomba Conservation Park camping area, Koombooloomba National Park and Conservation Park",
+  "Koombooloomba National Park bush camping area, Koombooloomba National Park and Conservation Park",
+  "Lady Musgrave Island campground, Capricornia Cays National Park",
+  "Laidley Creek Falls remote bush camp, Main Range National Park",
+  "Lake Benaroon great walk camp sites, K'gari (formerly Fraser Island) Great Walk",
+  "Lake Boomanjin camping area, K'gari, Great Sandy National Park",
+  "Lake Boomanjin great walk camp sites, K'gari (formerly Fraser Island) Great Walk",
+  "Lake Garawongera great walk camp sites, K'gari (formerly Fraser Island) Great Walk",
+  "Lake Murphy camping area, Lake Murphy Conservation Park",
+  "Lake Wabby great walk camp sites, K'gari (formerly Fraser Island) Great Walk",
+  "Lawn Hill Gorge (tent) camping area, Lawn Hill Gorge, Boodjamulla National Park (Aboriginal Land)",
+  "Lawn Hill Gorge (trailer) camping area, Lawn Hill Gorge, Boodjamulla National Park (Aboriginal Land)",
+  "Lepidozamia remote bush camp, D'Aguilar National Park",
+  "Light Line Road remote bush camp, D'Aguilar National Park",
+  "Lime Pocket camping area, Bribie Island National Park and Recreation Area",
+  "Litoria walkers' camp, Cooloola Great Walk",
+  "Little Boomerang Waterhole camping area, Welford National Park",
+  "Lizard South remote bush camp, Main Range National Park",
+  "Log Dump camping area, Tuan State Forest",
+  "Lonesome camping area, Expedition National Park",
+  "Lost World Creek remote bush camp, Lamington National Park",
+  "Lost World Saddle remote bush camp, Lamington National Park",
+  "Lower Davies Creek camping area, Davies Creek National Park, Dinden National Park, Dinden West Forest Reserve and Bare Hill Conservation Park",
+  "Lower Panorama Point remote bush camping, Main Range National Park",
+  "Lower Portals remote bush camp, Mount Barney National Park",
+  "MacDonald Point camping area, Shoalwater Bay Conservation Park",
+  "Mango Lagoon 1 camping area, Oyala Thumotang National Park (CYPAL)",
+  "Mango Lagoon 2 camping area, Oyala Thumotang National Park (CYPAL)",
+  "Mango Lagoon 3 camping area, Oyala Thumotang National Park (CYPAL)",
+  "Manna Gum camping area, Main Range National Park",
+  "Mariala Roadside camping area, Mariala National Park",
+  "Mariala Rockpools camping area, Mariala National Park",
+  "Mast Head Island, Capricornia Cays National Park",
+  "Maureen's Cove, Hook Island, Whitsunday Islands National Park",
+  "Meadow camping area, Charon Point Conservation Park",
+  "Melaleuca Waterhole camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "Mia Mia bush camping, Mia Mia State Forest",
+  "Miall Island camping area, Keppel Bay Islands National Park and Keppel Bay Islands National Park (Scientific)",
+  "Mick Fienn Waterhole camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "Middle Creek camping area, Eurimbula National Park",
+  "Middle Island camping area, Keppel Bay Islands National Park and Keppel Bay Islands National Park (Scientific)",
+  "Middle Kobble remote bush camp, D'Aguilar National Park",
+  "Middle Rock camping area, Deepwater National Park",
+  "Midway Waterhole camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "Mission Point camping area, Bribie Island National Park and Recreation Area",
+  "Miyumba camping area, Riversleigh World Heritage Area, Boodjamulla National Park (Aboriginal Land)",
+  "Monks Tank camping area, Idalia National Park",
+  "Montserrat Lookout remote bush camp, Mount Barney National Park",
+  "Moon Point camping area, K'gari, Great Sandy National Park",
+  "Moonlight Dam camping area, Homevale National Park",
+  "Moonlight Dam walkers' camp, Mackay Highlands Great Walk",
+  "Moonstone camping area, Blackbraes National Park",
+  "Mount Bithongabel bush camp, Lamington National Park",
+  "Mount Cleveland remote bush camp, Bowling Green Bay National Park",
+  "Mount Elliot remote bush camp, Bowling Green Bay National Park",
+  "Mount French vehicle-based camping area, Moogerah Peaks National Park",
+  "Mount Halifax remote bush camping south of Paluma, Paluma Range National Park",
+  "Mount Huntley remote bush camp, Main Range National Park",
+  "Mount Huntley Saddle remote bush camp, Main Range National Park",
+  "Mount May Saddle remote bush camp, Mount Barney National Park",
+  "Mount Spec remote bush camping north of Paluma, Paluma Range National Park",
+  "Mount Steamer Saddle remote bush camp, Main Range National Park",
+  "Mount Superbus-North Peak remote bush camp, Main Range National Park",
+  "Mount Superbus-South Peak remote bush camp, Main Range National Park",
+  "Mount Walsh bush camping, Mount Walsh National Park",
+  "Mouth of Baffle Creek, Mouth of Baffle Creek Conservation Park",
+  "Mouth of Kolan River camping area, Mouth of Kolan River Conservation Park",
+  "Mt Ballow Junction Peak remote bush camp, Mount Barney National Park",
+  "Mulgrave River (Goldfield trail) camping area, Goldfield trail, Wooroonooran National Park",
+  "Mulligan Bay camping area, Hinchinbrook Island National Park",
+  "Munall camping area, Blackdown Tableland National Park",
+  "Murray Falls, Girramay National Park",
+  "MV Beagle camping area, Inskip Peninsula Recreation Area",
+  "MV Natone camping area, Inskip Peninsula Recreation Area",
+  "MV Sarawak camping area, Inskip Peninsula Recreation Area",
+  "Myninya camping area, Currawinya National Park",
+  "Nari's Beach, Whitsunday Island, Whitsunday Islands National Park",
+  "Nebine Creek camping area, Culgoa Floodplain National Park",
+  "Neck Bay, Shaw Island, Lindeman Islands National Park",
+  "Neebs Waterhole camping area, Cooloola Recreation Area, Great Sandy National Park",
+  "Neurum Creek camping area, D'Aguilar National Park",
+  "Newry Island, Newry Islands National Park",
+  "Nine Mile Beach Casuarina, Byfield National Park, Conservation Park and State Forest",
+  "Nine Mile Beach Melaleuca, Byfield National Park, Conservation Park and State Forest",
+  "Nine Mile Beach Myrtella, Byfield National Park, Conservation Park and State Forest",
+  "Nine Mile Beach Pandanus, Byfield National Park, Conservation Park and State Forest",
+  "Ninian Bay camping area, Cape Melville National Park (CYPAL)",
+  "Nitchaga and Wall Creek bush camping, Koombooloomba National Park and Conservation Park",
+  "No. 3 Bore camping area, Mariala National Park",
+  "Noah Beach camping area, Cape Tribulation, Daintree National Park (CYPAL)",
+  "Nogoa River (Salvator Rosa section) camping area, Salvator Rosa, Carnarvon National Park",
+  "North Jardine River camping area, Jardine River National Park, Heathlands Resources Reserve and Jardine River Resources Reserve",
+  "North Keppel Island (Considine Beach), Keppel Bay Islands National Park and Keppel Bay Islands National Park (Scientific)",
+  "North Kobble remote bush camp, D'Aguilar National Park",
+  "North Macushla camping area, Hinchinbrook Island National Park",
+  "North Palmer River camping area, Palmer Goldfield Resources Reserve",
+  "North Point (tent site) camping area, Gheebulum Kunungai (Moreton Island) National Park and Moreton Island Recreation Area",
+  "North Point (trailer site) camping area, Gheebulum Kunungai (Moreton Island) National Park and Moreton Island Recreation Area",
+  "North West Island, Capricornia Cays National Park",
+  "North Zoe Bay camping area, Hinchinbrook Island National Park",
+  "North-east camping zone, Gheebulum Kunungai (Moreton Island) National Park and Moreton Island Recreation Area",
+  "North-west camping zone, Gheebulum Kunungai (Moreton Island) National Park and Moreton Island Recreation Area",
+  "Northbrook Mountain remote bush camp, D'Aguilar National Park",
+  "Northern Management Trail remote bush camp, Girraween National Park",
+  "Northern Spit, Henning Island, Whitsunday Islands National Park",
+  "Nuga Nuga remote bush camp, Nuga Nuga National Park",
+  "Nundubbermere Falls camping area, Sundown National Park",
+  "Nymph Island bush camping, Turtle Group National Park",
+  "Ocean Beach camping area, Bribie Island National Park and Recreation Area",
+  "Old Archer Crossing camping area, Oyala Thumotang National Park (CYPAL)",
+  "Old Faithful Waterhole camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "Old Forestry camping area, Bulburin National Park",
+  "Old Hut Site remote bush camp, Mount Barney National Park",
+  "Old Laura Homestead camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "One Tree camping area (fenced), K'gari, Great Sandy National Park",
+  "Orange Plain camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "Ourimperee Waterhole camping area, Currawinya National Park",
+  "Outer Newry Island, Newry Islands National Park",
+  "Oystercatcher camping area, Cape Melville National Park (CYPAL)",
+  "Pack Trail walkers' camp, Wallaman Falls Section, Wet Tropics Great Walk",
+  "Paddle Bay, South Molle Island, Molle Islands National Park",
+  "Paddys Knob remote bush camp, Main Range National Park",
+  "Paddys Plain remote bush camp, Mount Barney National Park",
+  "Panorama Point remote bush camp, Main Range National Park",
+  "Peach Trees camping area, Jimna State Forest",
+  "Peach Trees wheelchair friendly camp site, Jimna State Forest",
+  "Pelican Bay camping area, Inskip Peninsula Recreation Area",
+  "Pelican Island camping area, Keppel Bay Islands National Park and Keppel Bay Islands National Park (Scientific)",
+  "Penrith Island, South Cumberland Islands National Park",
+  "Pioneer Bay camping area, Orpheus Island National Park",
+  "Planton Island, Molle Islands National Park",
+  "Platypus Bay camping area, Teerk Roo Ra National Park",
+  "Platypus camping area, Danbulla National Park and State Forest",
+  "Point Lookout remote bush camp, Lamington National Park",
+  "Point Pure remote bush camp, Main Range National Park",
+  "Poplar Flat camping area, Main Range National Park",
+  "Poverty Creek camping area, Bribie Island National Park and Recreation Area",
+  "Poverty Creek trailer/group camping area, Bribie Island National Park and Recreation Area",
+  "Poverty Point (Cooloola) camping area, Cooloola Recreation Area, Great Sandy National Park",
+  "Powell Creek camping area, Hell Hole Gorge National Park",
+  "Princess Hills camping area, Princess Hills, Girringun National Park",
+  "Pump Hole camping area, Currawinya National Park",
+  "Pyramid camping area, Porcupine Gorge National Park",
+  "Rainforest camping area, Kutini-Payamu (Iron Range) National Park (CYPAL)",
+  "Ramparts South remote bush camp, Main Range National Park",
+  "Range View camping area, Bulburin National Park",
+  "Rat-a-tat remote bush camp, Lamington National Park",
+  "Razorback camping area, Kroombit Tops National Park",
+  "Red Rock (tent site) camping area, Byfield National Park, Conservation Park and State Forest",
+  "Red Rock (trailer/tent) camping area, Byfield National Park, Conservation Park and State Forest",
+  "Red Rock Gorge camping area, Sundown National Park",
+  "Redbank Hut camping area, Culgoa Floodplain National Park",
+  "Reedy Waterhole camping area, Sundown National Park",
+  "Refuge Bay, Scawfell Island, South Cumberland Islands National Park",
+  "Repulse Creek camping area, Conway Range trail, Conway National Park and Conway Conservation Park",
+  "Rodds Peninsula camping area, Eurimbula National Park",
+  "Rotary Shelter Shed (Mount Moffatt) camping area, Mount Moffatt, Carnarvon National Park",
+  "Roylen Bay camping area, Smith Islands National Park",
+  "Rum Jungle remote bush camp, Mount Barney National Park",
+  "Rungulla camping area, Rungulla National Park",
+  "Running Creek remote bush camp, Lamington National Park",
+  "Russell Island camping area (Commonwealth Island), Frankland Group National Park",
+  "Saddleback Island, Gloucester Islands National Park",
+  "Salmon Creek camping area, Cape Cleveland, Bowling Green Bay National Park",
+  "Saltwater Crossing camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "Sandy Bay, Long Island, Molle Islands National Park",
+  "Sandy Bay, South Molle Island, Molle Islands National Park",
+  "Sarawak West camping area, Inskip Peninsula Recreation Area",
+  "Scenic Rim Trail walkers camps, Scenic Rim Trail, Main Range National Park",
+  "School Point camping area, Danbulla National Park and State Forest",
+  "Scrub Road remote bush camp, D'Aguilar National Park",
+  "Sea Kayaking camping area, Hinchinbrook Island National Park",
+  "Second Coen River camping area, Oyala Thumotang National Park (CYPAL)",
+  "Seven Mile camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "Shields Island, Broad Sound Islands National Park",
+  "Shirley Shearing Shed camping area, Moorrinya National Park",
+  "Simpson Desert, Munga-Thirri National Park",
+  "Singapore Bay, South Cumberland Islands National Park",
+  "Six Mile Waterhole camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "Skull camp remote bush camp, Mount Barney National Park",
+  "Smalleys Beach, Cape Hillsborough National Park",
+  "Snapper Island camping area, Snapper Island, Hope Islands National Park (CYPAL)",
+  "South Bald Rock remote bush camp, Girraween National Park",
+  "South Beach camping area, Orpheus Island National Park",
+  "South Branch remote bush camp, Main Range National Park",
+  "South Jardine River camping area, Jardine River National Park, Heathlands Resources Reserve and Jardine River Resources Reserve",
+  "South Johnstone camping area, Palmerston (Doongan), Palmerston (Doongan), Wooroonooran National Park",
+  "South Kobble remote bush camp, D'Aguilar National Park",
+  "South Macushla camping area, Hinchinbrook Island National Park",
+  "South Repulse Island, Repulse Islands National Park",
+  "South Zoe Bay camping area, Hinchinbrook Island National Park",
+  "South-east camping zone, Gheebulum Kunungai (Moreton Island) National Park and Moreton Island Recreation Area",
+  "South-west camping zone, Gheebulum Kunungai (Moreton Island) National Park and Moreton Island Recreation Area",
+  "Southern Beach  camping area, Goold Island National Park",
+  "Speewah (multi-use sites) camping area, Speewah Conservation Park",
+  "Speewah (tent only sites) camping area, Speewah Conservation Park",
+  "Spicers Gap camping area, Main Range National Park",
+  "Spicers Peak (East) remote bush camp, Main Range National Park",
+  "Spicers Peak (West) remote bush camp, Main Range National Park",
+  "Spicers-Double Top Saddle remote bush camp, Main Range National Park",
+  "SS Dorrigo camping area, Inskip Peninsula Recreation Area",
+  "Starkvale camping area, Expedition National Park",
+  "Steamer Creek remote bush camp, Main Range National Park",
+  "Steens Beach, Hook Island, Whitsunday Islands National Park",
+  "Stephens Island camping area, Barnard Island Group National Park",
+  "Stern remote bush camp, Main Range National Park",
+  "Stinson remote bush camp, Lamington National Park",
+  "Stone Cottage remote bush camp, Girraween National Park",
+  "Stony Creek walkers' camp, Wallaman Falls Section, Wet Tropics Great Walk",
+  "Summer Falls walkers' camp, Conondale Range Great Walk",
+  "Sundown remote bush camp, Sundown National Park",
+  "Sunset Beach camping area, Hinchinbrook Island National Park",
+  "Swamp Bay camping area, Conway National Park and Conway Conservation Park",
+  "Swan Knoll remote bush camp, Main Range National Park",
+  "Sweetwater Lake camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "T Junction remote bush camp, Mount Barney National Park",
+  "Tallowwood walkers' camp, Conondale Range Great Walk",
+  "Tancred Island, Molle Islands National Park",
+  "Teebing (Wathumba Spit) camping area, K'gari, Great Sandy National Park",
+  "Teewah Beach camping area zone 1, Cooloola Recreation Area, Great Sandy National Park",
+  "Teewah Beach camping area zone 2, Cooloola Recreation Area, Great Sandy National Park",
+  "Teewah Beach camping area zone 3, Cooloola Recreation Area, Great Sandy National Park",
+  "Teewah Beach camping area zone 4, Cooloola Recreation Area, Great Sandy National Park",
+  "Teewah Beach camping area zone 5, Cooloola Recreation Area, Great Sandy National Park",
+  "Teewah Beach camping area zone 6, Cooloola Recreation Area, Great Sandy National Park",
+  "Teewah Beach camping area zone 7, Cooloola Recreation Area, Great Sandy National Park",
+  "Terrawambella (group area) camping area, Girraween National Park",
+  "Terrawambella (trailer sites) camping area, Girraween National Park",
+  "Terrawambella (trailer/tent site) camping area, Girraween National Park",
+  "The Broadwater camping area, Sundown National Park",
+  "The Diggings camping area, Crediton State Forest",
+  "The Haven (Scraggy Point) camping area, Hinchinbrook Island National Park",
+  "The Palms camping area, Goodedulla National Park",
+  "The Settlement camping area, Springbrook National Park",
+  "The Spit (Western Beach)  camping area, Goold Island National Park",
+  "The Wrecks camping area, Gheebulum Kunungai (Moreton Island) National Park and Moreton Island Recreation Area",
+  "Thilba Thalba walkers' camp, Sunshine Coast Hinterland Great Walk",
+  "Thorsborne Trail, Thorsborne Trail, Hinchinbrook Island National Park",
+  "Thrushton Homestead camping area, Thrushton National Park",
+  "Thrushton Woolshed camping area, Thrushton National Park",
+  "Tolderodden camping area, Tolderodden Conservation Park",
+  "Top Moffatt (Mount Moffatt section) camping area, Mount Moffatt, Carnarvon National Park",
+  "Top Whiphandle Waterhole camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "Tug's Point - Rabbit Island, Newry Islands National Park",
+  "Tully Gorge camping area, Tully section, Tully Gorge National Park",
+  "Turtle Beach, St Bees Island, South Cumberland Islands National Park",
+  "Turtle Group a - bush camping, Turtle Group National Park",
+  "Turtle Group b - bush camping, Turtle Group National Park",
+  "Turtle Group f - bush camping, Turtle Group National Park",
+  "Turtle Street camping area, Curtis Island National Park and Conservation Park",
+  "Twelve Mile Lagoon camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "Twin Lagoons 1 camping area, Oyala Thumotang National Park (CYPAL)",
+  "Twin Lagoons 2 camping area, Oyala Thumotang National Park (CYPAL)",
+  "Two Islands (a) bush camping, Three Islands Group National Park",
+  "Ubajee walkers' camp, Sunshine Coast Hinterland Great Walk",
+  "Ungowa (tent site) camping area, K'gari, Great Sandy National Park",
+  "Ungowa (trailer site) camping area, K'gari, Great Sandy National Park",
+  "Upper Davies Creek camping area, Davies Creek National Park, Dinden National Park, Dinden West Forest Reserve and Bare Hill Conservation Park",
+  "Upper Noosa River camping area 1, Cooloola Recreation Area, Great Sandy National Park",
+  "Upper Noosa River camping area 13, Cooloola Recreation Area, Great Sandy National Park",
+  "Upper Noosa River camping area 15, Cooloola Recreation Area, Great Sandy National Park",
+  "Upper Noosa River camping area 2, Cooloola Recreation Area, Great Sandy National Park",
+  "Upper Noosa River camping area 3, Cooloola Recreation Area, Great Sandy National Park",
+  "Upper Noosa River camping area 4, Cooloola Recreation Area, Great Sandy National Park",
+  "Upper Noosa River camping area 5, Cooloola Recreation Area, Great Sandy National Park",
+  "Upper Noosa River camping area 8, Cooloola Recreation Area, Great Sandy National Park",
+  "Upper Noosa River camping area 9, Cooloola Recreation Area, Great Sandy National Park",
+  "Upper Stony camping area, Byfield National Park, Conservation Park and State Forest",
+  "Ussher Point camping area, Jardine River National Park, Heathlands Resources Reserve and Jardine River Resources Reserve",
+  "Valley of the Giants great walk camp sites, K'gari (formerly Fraser Island) Great Walk",
+  "Vardons Lagoon camping area, Oyala Thumotang National Park (CYPAL)",
+  "Victor Bay, South Cumberland Islands National Park",
+  "Waddy Point beachfront (tent site) camping area, K'gari, Great Sandy National Park",
+  "Waddy Point beachfront (trailer site) camping area, K'gari, Great Sandy National Park",
+  "Waddy Point Top (tent site) camping area, K'gari, Great Sandy National Park",
+  "Waddy Point Top (trailer site) camping area, K'gari, Great Sandy National Park",
+  "Wadlows Yards camping area, Goodedulla National Park",
+  "Wairuna camping area, Wairuna, Girringun National Park",
+  "Wallaman Falls camping area, Wallaman Falls, Girringun National Park",
+  "Wallangarra Ridge remote bush camp, Girraween National Park",
+  "Walters Waterhole camping area, Misty Mountains wilderness tracks",
+  "Wandi Waterhole camping area, Cooloola Recreation Area, Great Sandy National Park",
+  "Water Park Creek camping area, Byfield National Park, Conservation Park and State Forest",
+  "Water Park Point Headland - Scouts camp, Byfield National Park, Conservation Park and State Forest",
+  "Wathumba (tent site) camping area (fenced area), K'gari, Great Sandy National Park",
+  "Wathumba (trailer site) camping area (fenced), K'gari, Great Sandy National Park",
+  "Watsons Bay camping area, Lizard Island National Park",
+  "Welcome Waterhole camping area, Rinyirru (Lakefield) National Park (CYPAL)",
+  "West Branch (Mount Moffatt section) camping area, Mount Moffatt, Carnarvon National Park",
+  "West Branch walkers' camp (Great Walk), Carnarvon Great Walk",
+  "Westcott camping area, Bunya Mountains National Park",
+  "Wheeler Island camping area, Family Islands National Park",
+  "Whitehaven Beach, Whitsunday Island, Whitsunday Islands National Park",
+  "Wild Cattle Island remote bush camp, Wild Cattle Island National Park",
+  "Wilderness Cove  camping area, Goold Island National Park",
+  "Windmill Bay camping area, Cape Palmerston National Park",
+  "Wongai camping area, Cape Melville National Park (CYPAL)",
+  "Wongai camping area (fenced), K'gari, Great Sandy National Park",
+  "Wongai walkers' camp, Conondale Range Great Walk",
+  "Wongi Waterholes camping area, Wongi State Forest",
+  "Woonoongoora walkers' camp, Gold Coast Hinterland Great Walk",
+  "Woralie Creek camping area, K'gari, Great Sandy National Park",
+  "Wreck Rock camping area, Deepwater National Park",
+  "Wuthura Island camping area, Wuthara Island National Park (CYPAL)",
+  "Wundu camping area, Canyon Resources Reserve",
+  "Yamahra Creek remote bush camp, Mount Barney National Park",
+  "Yamanie walkers' camp, Wallaman Falls Section, Wet Tropics Great Walk",
+  "Yanks Jetty camping area, Orpheus Island National Park",
+  "Yellow Patch camping area, Curtis Island National Park and Conservation Park",
+  "Yellow Patch camping zone, Gheebulum Kunungai (Moreton Island) National Park and Moreton Island Recreation Area",
+  "Zamia camping area, Bulburin National Park",
+  "10 Mile Junction camping area, Oyala Thumotang National Park (CYPAL)"
+            ];
+
+            function convertToFilename(campsite) {
+                return campsite
+                    .replace(/[^a-zA-Z0-9()-]/g, '_')  // Replace special chars except ()- with underscores
+                    .replace(/\s+/g, '_')              // Replace spaces with underscores
+                    .replace(/_+/g, '_')               // Replace multiple underscores with single
+                    .replace(/^_|_$/g, '')             // Remove leading and trailing underscores
+                    + '.html';
+            }
+
+            function performSearch() {
+                const searchTerm = searchInput.value.toLowerCase();
+                searchResults.innerHTML = '';
+                let resultsFound = false;
+
+                campsites.forEach(campsite => {
+                    if (campsite.toLowerCase().includes(searchTerm)) {
+                        const resultItem = document.createElement('div');
+                        resultItem.textContent = campsite;
+                        resultItem.addEventListener('click', () => {
+                            const filename = convertToFilename(campsite);
+                            window.location.href = `campsite_pages/${filename}`;
+                        });
+                        searchResults.appendChild(resultItem);
+                        resultsFound = true;
+                    }
+                });
+
+                if (!resultsFound) {
+                    searchResults.innerHTML = '<div>No results found</div>';
+                }
+
+                searchResults.style.display = 'block';
+            }
+
+            searchInput.addEventListener('input', performSearch);
+            searchButton.addEventListener('click', performSearch);
+
+            document.addEventListener('click', function(e) {
+                if (!searchResults.contains(e.target) && e.target !== searchInput) {
+                    searchResults.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
+<script type="text/babel">
+    const { useState, useEffect } = React;
+    
+    const CampsiteMap = () => {
+        const [campsites, setCampsites] = useState([]);
+
+        useEffect(() => {
+            const fetchExcelData = async () => {
+                try {
+                    const response = await fetch('/Users/ADMIN/Library/CloudStorage/OneDrive-Personal/Coding/Campscan/Back/camp_info.xlsx');
+                    const arrayBuffer = await response.arrayBuffer();
+                    const data = new Uint8Array(arrayBuffer);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                    const formattedData = jsonData.map(row => ({
+                        name: row['Booking_Location'],
+                        lat: parseFloat(row.Latitude),
+                        lng: parseFloat(row.Longitude)
+                    }));
+
+                    console.log('Raw Excel data:', jsonData);
+                    console.log('Formatted campsite data:', formattedData);
+
+                    setCampsites(formattedData);
+                    initializeSearch(formattedData);
+                } catch (error) {
+                    console.error('Error fetching or parsing Excel file:', error);
+                    setCampsites([]);
+                }
+            };
+
+            fetchExcelData();
+        }, []);
+
+        useEffect(() => {
+            if (campsites.length > 0 && window.L) {
+                const map = L.map('campsite-map').setView([-20.9176, 142.7028], 5);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+
+                campsites.forEach((campsite) => {
+                    if (campsite.lat && campsite.lng) {
+                        L.marker([campsite.lat, campsite.lng])
+                            .addTo(map)
+                            .bindPopup(campsite.name);
+                    }
+                });
+            }
+        }, [campsites]);
+
+        return <div id="campsite-map" style={{ height: '400px', width: '100%' }}></div>;
+    };
+
+    function initializeSearch(campsites) {
+        const searchInput = document.querySelector('.search-bar input');
+        const searchButton = document.getElementById('campground_search_btn');
+        const searchResults = document.getElementById('search-results');
+
+        function convertToFilename(campsite) {
+            return campsite
+                .replace(/[^a-zA-Z0-9()-]/g, '_')
+                .replace(/\s+/g, '_')
+                .replace(/_+/g, '_')
+                .replace(/^_|_$/g, '')
+                + '.html';
+        }
+
+        function performSearch() {
+            const searchTerm = searchInput.value.toLowerCase();
+            searchResults.innerHTML = '';
+            let resultsFound = false;
+
+            campsites.forEach(campsite => {
+                if (campsite.name.toLowerCase().includes(searchTerm)) {
+                    const resultItem = document.createElement('div');
+                    resultItem.textContent = campsite.name;
+                    resultItem.addEventListener('click', () => {
+                        const filename = convertToFilename(campsite.name);
+                        window.location.href = `campsite_pages/${filename}`;
+                    });
+                    searchResults.appendChild(resultItem);
+                    resultsFound = true;
+                }
+            });
+
+            if (!resultsFound) {
+                searchResults.innerHTML = '<div>No results found</div>';
+            }
+
+            searchResults.style.display = 'block';
+        }
+
+        searchInput.addEventListener('input', performSearch);
+        searchButton.addEventListener('click', performSearch);
+
+        document.addEventListener('click', function(e) {
+            if (!searchResults.contains(e.target) && e.target !== searchInput) {
+                searchResults.style.display = 'none';
+            }
+        });
+    }
+
+    ReactDOM.render(
+        <CampsiteMap />,
+        document.getElementById('campsite-map')
+    );
+</script>
+</body>
+</html>

@@ -1,0 +1,303 @@
+/* Import the Inter font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+.header {
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1rem 2rem;
+}
+
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo img {
+    height: 100px;
+    width: auto;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links li {
+    display: inline-block;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #212529;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.hero {
+    text-align: center;
+    padding: 2rem 1rem;
+    background-color: #f8f9fa;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.hero p {
+    font-size: 1.25rem;
+    font-weight: 400;
+    margin-bottom: 1rem;
+}
+
+.search-bar {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 9999px;
+    outline: none;
+    font-weight: 500;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar .search-button {
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    bottom: 4px;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ff7f2a;
+    border: 2px solid #002255;
+    border-radius: 9999px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    box-sizing: border-box;
+}
+
+.search-bar .search-button:hover {
+    background-color: #e06000;
+}
+
+.search-bar .search-button svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    fill: white;
+}
+
+.search-bar input::placeholder {
+    color: #6c757d;
+    font-weight: 400;
+}
+
+.how-it-works {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1080px;
+    margin: 2em auto;
+    padding: 0 1em;
+}
+
+.step {
+    flex: 1;
+    text-align: center;
+    padding: 0 1em;
+    font-size: 1.1em;
+}
+
+.step-number {
+    display: inline-block;
+    width: 26px;
+    height: 26px;
+    background-color: #ff7f2a;
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 26px;
+    margin-right: 0.5em;
+}
+
+.step h3 {
+    display: inline-block;
+    margin: 0;
+    font-size: 1.21em;
+}
+
+.step p {
+    margin-top: 0.5em;
+    font-size: 0.99em;
+    color: #666;
+}
+
+.trending {
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.trending h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+}
+
+.campgrounds-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    justify-content: center;
+    padding-bottom: 1.25rem;
+    max-width: 90%;
+    margin: 0 auto;
+}
+
+.campground {
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-top: 10rem;
+    padding-bottom: 1rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: transform 0.3s, opacity 0.3s;
+    width: 85%;
+    margin: 0 auto;
+}
+
+.campground:hover {
+    transform: translateY(-0.125rem);
+    opacity: 0.9;
+}
+
+.campground-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.campground-location {
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: #ffffff;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 2rem;
+}
+
+.text-styling {
+    width: 66.666667%;
+    margin: 0 auto;
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+@media (min-width: 768px) {
+    .text-styling {
+        font-size: 1.5rem;
+    }
+}
+
+.search-results {
+    display: none;
+    position: absolute;
+    top: 60px;
+    background: white;
+    border: 1px solid #ccc;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    border-radius: 8px;
+    left: 0;
+    text-align: left;
+}
+
+.search-result {
+    padding: 10px;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s ease; /* New: Add smooth transition for background color change */
+}
+
+.search-result:hover {
+    background-color: #d0d0d0; /* Lighter shade when hovering */
+}
+
+.search-result div {
+    margin-left: 10px;
+}
+
+/* New styles for dropdown cursor changes */
+.search-results > div,
+.search-results > a,
+.search-results > button,
+.search-results > li,
+.search-results * {
+    cursor: pointer;
+}
+
+.search-results > div:hover,
+.search-results > a:hover,
+.search-results > button:hover,
+.search-results > li:hover,
+.search-results *:hover {
+    background-color:#d0d0d0;
+    cursor: pointer;
+}
+.copyright {
+    text-align: center;
+    padding: 1rem 0;
+}
+
+footer {
+    text-align: center;
+}

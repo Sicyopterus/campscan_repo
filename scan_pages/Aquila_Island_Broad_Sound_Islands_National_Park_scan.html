@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Page</title>
+    <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Retain all original styles */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+
+        .header {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+ 
+        .logo {
+            margin-left: 10%;
+        }
+
+        .logo img {
+            height: 100px;
+            width: auto;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #212529;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: #1a202c;
+        }
+
+        .container {
+            max-width: 3xl;
+            margin: 0 auto;
+            padding: 1rem;
+            min-width: 800px; /* Add this line to set a minimum width */
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .card-content {
+            padding: 1rem;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            font-weight: 500;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .button-primary {
+            background-color: #4a5568;
+            color: white;
+        }
+
+        .button-primary:hover {
+            background-color: #2d3748;
+        }
+
+        .input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const Button = ({ children, className, ...props }) => (
+            <button className={`button ${className}`} {...props}>{children}</button>
+        );
+
+        const Input = ({ className, ...props }) => (
+            <input className={`input ${className}`} {...props} />
+        );
+
+        const Card = ({ children, className, ...props }) => (
+            <div className={`card ${className}`} {...props}>{children}</div>
+        );
+
+        const CardHeader = ({ children, className, ...props }) => (
+            <div className={`card-header ${className}`} {...props}>{children}</div>
+        );
+
+        const CardContent = ({ children, className, ...props }) => (
+            <div className={`card-content ${className}`} {...props}>{children}</div>
+        );
+
+        const Header = () => (
+    <header className="header">
+        <div className="nav">
+            <div className="logo">
+                <a href="/Users/ADMIN/Library/CloudStorage/OneDrive-Personal/Coding/Campscan/Back/index2.html">
+                    <img src="images/CampScan-Logo6.png" alt="CampScan Logo" />
+                </a>
+            </div>
+            <nav>
+                <ul className="nav-links">
+                    <li><a href="/Users/ADMIN/Library/CloudStorage/OneDrive-Personal/Coding/Campscan/Back/index2.html">Home</a></li>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+);
+
+        const BookingPage = () => {
+            const [selectedDates, setSelectedDates] = useState([]);
+            const [nights, setNights] = useState(1);
+            const [siteType, setSiteType] = useState('');
+            const [currentDate, setCurrentDate] = useState(new Date(2024, 8, 1)); // September 1, 2024
+
+            const handleDateSelect = (date) => {
+                const fullDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), date);
+                if (selectedDates.some(d => d.getTime() === fullDate.getTime())) {
+                    setSelectedDates(selectedDates.filter(d => d.getTime() !== fullDate.getTime()));
+                } else if (selectedDates.length < 6) {
+                    setSelectedDates([...selectedDates, fullDate].sort((a, b) => a - b));
+                }
+            };
+
+            const handleRemoveDate = (date) => {
+                setSelectedDates(selectedDates.filter(d => d.getTime() !== date.getTime()));
+            };
+
+            const getDaysInMonth = (date) => {
+                return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+            };
+
+            const getFirstDayOfMonth = (date) => {
+                return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+            };
+
+            const handlePrevMonth = () => {
+                setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+            };
+
+            const handleNextMonth = () => {
+                setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+            };
+
+            const renderCalendar = () => {
+                const daysInMonth = getDaysInMonth(currentDate);
+                const firstDay = getFirstDayOfMonth(currentDate);
+                const days = [];
+
+                for (let i = 0; i < firstDay; i++) {
+                    days.push(<div key={`empty-${i}`} className="text-center"></div>);
+                }
+
+                for (let i = 1; i <= daysInMonth; i++) {
+                    const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), i);
+                    const isSelected = selectedDates.some(d => d.getTime() === date.getTime());
+                    days.push(
+                        <Button
+                            key={i}
+                            className={`w-full ${isSelected ? 'bg-[#FF8C00] text-white' : 'bg-gray-200'}`}
+                            onClick={() => handleDateSelect(i)}
+                        >
+                            {i}
+                        </Button>
+                    );
+                }
+
+                return days;
+            };
+
+            return (
+                <React.Fragment>
+                    <Header />
+                    <div className="container" style={{width: '50%', margin: '0 auto'}}>
+
+                        
+                        <Card className="mb-6">
+                            <CardHeader>
+                                <h2 className="text-xl font-semibold">Aquila Island</h2>
+                                <p className="text-gray-600">Broad Sound Islands National Park</p>
+                            </CardHeader>
+
+                        </Card>
+
+                        <Card className="mb-6">
+                            <CardHeader>
+                                <h3 className="text-lg font-semibold">1. Select your arrival dates</h3>
+                                <p className="text-sm text-gray-600">Which dates can you arrive? Select up to 6.</p>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="flex justify-between">
+                                    <div className="w-1/2">
+                                        <div className="flex justify-between items-center mb-4">
+                                            <h4 className="font-semibold">{currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</h4>
+                                            <div>
+                                                <Button className="bg-gray-200" onClick={handlePrevMonth}><span>&#8592;</span></Button>
+                                                <Button className="bg-gray-200" onClick={handleNextMonth}><span>&#8594;</span></Button>
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-7 gap-2 mb-4">
+                                            {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
+                                                <div key={day} className="text-center font-semibold">{day}</div>
+                                            ))}
+                                            {renderCalendar()}
+                                        </div>
+                                    </div>
+                                    <div className="w-1/2 pl-4">
+                                        <h4 className="font-semibold mb-2 text-center">What days can you arrive? ({selectedDates.length} selected)</h4> 
+                                        <div className="flex flex-col gap-2">
+                                            {selectedDates.map(date => (
+                                                <Button key={date.getTime()} className="bg-gray-300 text-gray-800 flex items-center justify-between" onClick={() => handleRemoveDate(date)}>
+                                                    <span>{date.toLocaleString('default', { weekday: 'short', month: 'numeric', day: 'numeric' })}</span>
+                                                    <span>&#10005;</span>
+                                                </Button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                                <p className="text-sm text-gray-600 mt-2">
+                                    You've selected {selectedDates.length} days to watch. <Button className="p-0 h-auto text-[#FFA500]" onClick={() => setSelectedDates([])}>Reset</Button>
+                                </p>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="mb-6">
+                            <CardHeader>
+                                <h3 className="text-lg font-semibold">2. Select your nights</h3>
+                                <p className="text-sm text-gray-600">How many nights do you want to stay?</p>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="flex items-center gap-2">
+                                    <Button className="bg-gray-200" onClick={() => setNights(Math.max(1, nights - 1))}>-</Button>
+                                    <Input type="number" value={nights} onChange={(e) => setNights(parseInt(e.target.value) || 1)} className="w-16 text-center" />
+                                    <span>night{nights !== 1 && 's'}</span>
+                                    <Button className="bg-gray-200" onClick={() => setNights(nights + 1)}>+</Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="mb-6">
+                            <CardHeader>
+                                <h3 className="text-lg font-semibold">3. Select your preferred sites</h3>
+                                <p className="text-sm text-gray-600">Filter by amenities, useful for larger campgrounds.</p>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="flex gap-2 mb-4">
+                                    <Button className={siteType === 'RV' ? 'bg-[#FF8C00] text-white' : 'bg-gray-200'} onClick={() => setSiteType('RV')}>RV</Button>
+                                    <Button className={siteType === 'Tent' ? 'bg-[#FF8C00] text-white' : 'bg-gray-200'} onClick={() => setSiteType('Tent')}>Tent</Button>
+                                </div>
+                                <p className="text-sm text-gray-600">No matching sites. Please broaden your filters.</p>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="mb-6">
+                            <CardHeader>
+                                <h3 className="text-lg font-semibold">4. Enter your email address</h3>
+                                <p className="text-sm text-gray-600">We'll send you an email when we find an opening.</p>
+                            </CardHeader>
+                            <CardContent>
+                                <Input type="email" placeholder="Enter your email" className="w-full mb-2" />
+                                <p className="text-sm text-gray-600">
+                                    We'll create a free account when you submit this request. <a href="#" className="text-[#FF8C00] hover:underline">Already have an account?</a>
+                                </p>
+                            </CardContent>
+                        </Card>
+
+                        <Button className="w-full bg-[#FF8C00] text-white hover:bg-[#E67E00]">Create new request</Button>
+                            
+                        <p className="text-sm text-center text-gray-600 mt-4">
+                            By submitting this request, you agree to our <a href="#" className="text-[#FF8C00] hover:underline">Terms and Conditions</a> and <a href="#" className="text-[#FF8C00] hover:underline">Privacy Policy</a>
+                        </p>
+                    </div>
+                </React.Fragment>
+            );
+        };
+
+        ReactDOM.render(
+            <React.StrictMode>
+                <BookingPage />
+            </React.StrictMode>,
+            document.getElementById('root')
+        );
+    </script>
+</body>
